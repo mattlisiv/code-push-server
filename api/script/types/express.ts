@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+import * as express from "express";
+
 declare namespace Express {
   export interface Session {
     [key: string]: any;
@@ -11,3 +13,7 @@ declare namespace Express {
     session?: Session;
   }
 }
+
+export type AuthenticatedRequest = {
+  user?: any;
+} & express.Request;

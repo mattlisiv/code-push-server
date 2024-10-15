@@ -80,6 +80,7 @@ export class PassportAuthentication {
     );
   }
 
+  //@ts-ignore
   public authenticate(req: Request, res: Response, next: (err?: Error) => void): void {
     passport.authenticate("bearer", { session: false }, (err: any, user: any) => {
       if (err || !user) {
@@ -100,6 +101,7 @@ export class PassportAuthentication {
           next(err);
         }
       } else {
+        // @ts-ignore
         req.user = user;
         next();
       }
@@ -166,16 +168,19 @@ export class PassportAuthentication {
     }
 
     router.get("/auth/login", this._cookieSessionMiddleware, (req: Request, res: Response): any => {
+      // @ts-ignore
       req.session["hostname"] = req.query.hostname;
       res.render("authenticate", { action: "login" });
     });
 
     router.get("/auth/link", this._cookieSessionMiddleware, (req: Request, res: Response): any => {
+      // @ts-ignore
       req.session["authorization"] = req.query.access_token;
       res.render("authenticate", { action: "link" });
     });
 
     router.get("/auth/register", this._cookieSessionMiddleware, (req: Request, res: Response): any => {
+      // @ts-ignore
       req.session["hostname"] = req.query.hostname;
       res.render("authenticate", { action: "register" });
     });
@@ -253,6 +258,7 @@ export class PassportAuthentication {
       limiter,
       this._cookieSessionMiddleware,
       (req: Request, res: Response, next: (err?: any) => void): any => {
+        // @ts-ignore
         req.session["action"] = "login";
 
         passport.authenticate(strategyName, { session: false })(req, res, next);
@@ -260,7 +266,7 @@ export class PassportAuthentication {
     );
 
     router.get(
-      "/auth/register/" + providerName, 
+      "/auth/register/" + providerName,
       limiter,
       this._cookieSessionMiddleware,
       (req: Request, res: Response, next: (err?: any) => void): any => {
@@ -268,7 +274,7 @@ export class PassportAuthentication {
           restErrorUtils.sendForbiddenError(res);
           return;
         }
-
+        // @ts-ignore
         req.session["action"] = "register";
 
         passport.authenticate(strategyName, { session: false })(req, res, next);
@@ -280,6 +286,7 @@ export class PassportAuthentication {
       limiter,
       this._cookieSessionMiddleware,
       (req: Request, res: Response, next: (err?: any) => void): any => {
+        // @ts-ignore
         req.session["action"] = "link";
 
         passport.authenticate(strategyName, { session: false })(req, res, next);
@@ -292,8 +299,11 @@ export class PassportAuthentication {
       this._cookieSessionMiddleware,
       passport.authenticate(strategyName, { failureRedirect: "/auth/login/" + providerName, session: false }),
       (req: Request, res: Response, next: (err?: any) => void): any => {
+        // @ts-ignore
         const action: string = req.session["action"];
+        // @ts-ignore
         const hostname: string = req.session["hostname"];
+        // @ts-ignore
         const user: passport.Profile = req.user;
 
         if (action === "register" && !PassportAuthentication.isAccountRegistrationEnabled()) {
@@ -332,7 +342,9 @@ export class PassportAuthentication {
 
           return this._storageInstance.addAccessKey(accountId, accessKey).then((accessKeyId: string): void => {
             const key: string = accessKey.name;
+            //@ts-ignore
             req.session["accessKey"] = key;
+            //@ts-ignore
             req.session["isNewAccount"] = action === "register";
 
             res.redirect("/accesskey");
@@ -421,10 +433,13 @@ export class PassportAuthentication {
       }
     );
 
+    //@ts-ignore
     router.get("/accesskey", limiter, this._cookieSessionMiddleware, (req: Request, res: Response): any => {
+      //@ts-ignore
       const accessKey: string = req.session["accessKey"];
+      //@ts-ignore
       const isNewAccount: boolean = req.session["isNewAccount"];
-
+      //@ts-ignore
       req.session = null;
 
       res.render("accesskey", { accessKey: accessKey, isNewAccount: isNewAccount });

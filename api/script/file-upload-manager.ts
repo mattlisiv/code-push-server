@@ -6,6 +6,10 @@ import multer = require("multer");
 
 const UPLOAD_SIZE_LIMIT_MB: number = parseInt(process.env.UPLOAD_SIZE_LIMIT_MB) || 200;
 
+/**
+ * Get the function to upload attachments.
+ * @param maxFileSizeMb
+ */
 function getAttachUploadFileFunction(maxFileSizeMb: number): express.RequestHandler {
   return multer({
     storage: multer.memoryStorage(),
@@ -15,6 +19,12 @@ function getAttachUploadFileFunction(maxFileSizeMb: number): express.RequestHand
   }).any();
 }
 
+/**
+ * Middleware to handle file uploads.
+ * @param req
+ * @param res
+ * @param next
+ */
 export function fileUploadMiddleware(req: express.Request, res: express.Response, next: express.NextFunction): void {
   const maxFileSizeMb = UPLOAD_SIZE_LIMIT_MB;
   const attachUploadFile: express.RequestHandler = getAttachUploadFileFunction(maxFileSizeMb);
@@ -32,6 +42,11 @@ export function fileUploadMiddleware(req: express.Request, res: express.Response
   });
 }
 
+/**
+ * Get the file with the specified field name.
+ * @param req
+ * @param field
+ */
 export function getFileWithField(req: Express.Request, field: string): Express.Multer.File {
   for (const i in req.files) {
     if (req.files[i].fieldname === field) {

@@ -26,12 +26,22 @@ export interface AcquisitionConfig {
   redisManager: redis.RedisManager;
 }
 
+/**
+ * This function is used to get the update metadata for a given deployment key.
+ * @param originalUrl
+ */
 function getUrlKey(originalUrl: string): string {
   const obj: any = URL.parse(originalUrl, /*parseQueryString*/ true);
   delete obj.query.clientUniqueId;
   return obj.pathname + "?" + queryString.stringify(obj.query);
 }
 
+/**
+ * This function is used to get the update metadata for a given deployment key.
+ * @param req The request object
+ * @param res The response object
+ * @param storage The storage object
+ */
 function createResponseUsingStorage(
   req: express.Request,
   res: express.Response,
@@ -71,6 +81,8 @@ function createResponseUsingStorage(
     }
   }
 
+  // If the request is for a companion app, we should not return an update, as the
+  // expectation is that the app is already bundled with the main app.
   if (validationUtils.isValidUpdateCheckRequest(updateRequest)) {
     return storage.getPackageHistoryFromDeploymentKey(updateRequest.deploymentKey).then((packageHistory: storageTypes.Package[]) => {
       const updateObject: UpdateCheckCacheResponse = acquisitionUtils.getUpdatePackageInfo(packageHistory, updateRequest);
@@ -90,6 +102,7 @@ function createResponseUsingStorage(
       return q(cacheableResponse);
     });
   } else {
+    // If the request is invalid, we should return a 400 error.
     if (!validationUtils.isValidKeyField(updateRequest.deploymentKey)) {
       errorUtils.sendMalformedRequestError(
         res,
@@ -117,7 +130,7 @@ export function getHealthRouter(config: AcquisitionConfig): express.Router {
   const storage: storageTypes.Storage = config.storage;
   const redisManager: redis.RedisManager = config.redisManager;
   const router: express.Router = express.Router();
-
+  // This route is used by the CodePush cli to check the status of the CodePush server.
   router.get("/health", (req: express.Request, res: express.Response, next: (err?: any) => void): any => {
     storage
       .checkHealth()
@@ -138,7 +151,7 @@ export function getAcquisitionRouter(config: AcquisitionConfig): express.Router 
   const storage: storageTypes.Storage = config.storage;
   const redisManager: redis.RedisManager = config.redisManager;
   const router: express.Router = express.Router();
-
+  // This route is used by the SDK to get the current package information.
   const updateCheck = function (newApi: boolean) {
     return function (req: express.Request, res: express.Response, next: (err?: any) => void) {
       const deploymentKey: string = String(req.query.deploymentKey || req.query.deployment_key);
@@ -201,6 +214,7 @@ export function getAcquisitionRouter(config: AcquisitionConfig): express.Router 
     };
   };
 
+  // This route is used by the SDK to get the current package information.
   const reportStatusDeploy = function (req: express.Request, res: express.Response, next: (err?: any) => void) {
     const deploymentKey = req.body.deploymentKey || req.body.deployment_key;
     const appVersion = req.body.appVersion || req.body.app_version;

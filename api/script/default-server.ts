@@ -21,6 +21,13 @@ interface Secret {
   value: string;
 }
 
+/**
+ * Middleware to handle errors thrown by body-parser.
+ * @param err Error thrown by body-parser.
+ * @param req Request object.
+ * @param res Response object.
+ * @param next Next middleware.
+ */
 function bodyParserErrorHandler(err: any, req: express.Request, res: express.Response, next: Function): void {
   if (err) {
     if (err.message === "invalid json" || (err.name === "SyntaxError" && ~err.stack.indexOf("body-parser"))) {
@@ -34,6 +41,12 @@ function bodyParserErrorHandler(err: any, req: express.Request, res: express.Res
   }
 }
 
+/**
+ * Start the server.
+ * @param done
+ * @param useJsonStorage
+ */
+// eslint-disable-next-line no-unused-vars
 export function start(done: (err?: any, server?: express.Express, storage?: Storage) => void, useJsonStorage?: boolean): void {
   let storage: Storage;
   let isKeyVaultConfigured: boolean;
@@ -124,7 +137,7 @@ export function start(done: (err?: any, server?: express.Express, storage?: Stor
       app.use(appInsights.router());
 
       app.get("/", (req: express.Request, res: express.Response, next: (err?: Error) => void): any => {
-        res.send("Welcome to the CodePush REST API!");
+        res.send("Welcome to the CodePush REST API today!");
       });
 
       app.set("etag", false);
@@ -148,6 +161,7 @@ export function start(done: (err?: any, server?: express.Express, storage?: Stor
               console.log("No DEBUG_USER_ID environment variable configured. Using 'default' as user id");
             }
 
+            //@ts-ignore
             req.user = {
               id: userId,
             };

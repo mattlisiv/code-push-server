@@ -6,6 +6,7 @@ import * as restHeaders from "../utils/rest-headers";
 import * as restTypes from "../types/rest-definitions";
 import ApplicationInsights = require("applicationinsights");
 import tryJSON = require("try-json");
+import {AuthenticatedRequest} from "../types/express";
 
 enum ServiceResource {
   AccessKeys,
@@ -40,6 +41,7 @@ interface ServiceResourceDefinition {
   regExp: RegExp;
   tag: string;
 }
+
 
 const INSTRUMENTATION_KEY = process.env["APP_INSIGHTS_INSTRUMENTATION_KEY"];
 
@@ -151,7 +153,7 @@ export class AppInsights {
   public getRouter(): express.Router {
     const router: express.Router = express.Router();
 
-    router.use((req: express.Request, res: express.Response, next: (err?: Error) => void): any => {
+    router.use((req: AuthenticatedRequest, res: express.Response, next: (err?: Error) => void): any => {
       const reqStart = new Date().getTime();
       // If the application insights has not been instrumented, short circuit to next middleware.
       const isHealthCheck: boolean = req.url === "/health";

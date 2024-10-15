@@ -11,22 +11,42 @@ import { AppInsights } from "./routes/app-insights";
 import { InputSanitizer } from "./routes/input-sanitizer";
 import { RequestTimeoutHandler } from "./routes/request-timeout";
 
+/**
+ * Middleware to add headers to the response.
+ * @param config
+ */
 export function headers(config: HeadersConfig): RequestHandler {
   return getHeadersMiddleware(config);
 }
 
+/**
+ * Router for acquisition routes.
+ * @param config
+ */
 export function acquisition(config: AcquisitionConfig): Router {
   return getAcquisitionRouter(config);
 }
 
+/**
+ * Router for health routes.
+ * @param config
+ */
 export function health(config: AcquisitionConfig): Router {
   return getHealthRouter(config);
 }
 
+/**
+ * Router for management routes.
+ * @param config
+ */
 export function management(config: ManagementConfig): Router {
   return getManagementRouter(config);
 }
 
+/**
+ * Middleware to handle authentication.
+ * @param config Configuration for authentication.
+ */
 export function auth(config: AuthenticationConfig): any {
   const passportAuthentication = new PassportAuthentication(config);
   return {
@@ -36,6 +56,9 @@ export function auth(config: AuthenticationConfig): any {
   };
 }
 
+/**
+ * Middleware to handle application insights.
+ */
 export function appInsights(): any {
   const appInsights = new AppInsights();
 
@@ -45,10 +68,16 @@ export function appInsights(): any {
   };
 }
 
+/**
+ * Middleware to sanitize input.
+ */
 export function inputSanitizer(): any {
   return InputSanitizer;
 }
 
+/**
+ * Middleware to handle request timeout.
+ */
 export function requestTimeoutHandler(): RequestHandler {
   return RequestTimeoutHandler;
 }
